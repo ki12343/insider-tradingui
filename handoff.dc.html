@@ -31,14 +31,14 @@
   <!-- ============ GLOBAL TOP NAV ============ -->
   <div style="position:sticky; top:0; z-index:70; background:rgba(238,241,246,.84); backdrop-filter:saturate(180%) blur(12px); -webkit-backdrop-filter:saturate(180%) blur(12px); border-bottom:1px solid #E0E5EC;">
     <div style="max-width:920px; margin:0 auto; padding:0 20px; height:56px; display:flex; align-items:center; justify-content:space-between; gap:16px;">
-      <a href="app.dc.html" style="display:flex; align-items:center; gap:10px; text-decoration:none; min-width:0;">
+      <a href="내부자거래 공통 UI.dc.html" style="display:flex; align-items:center; gap:10px; text-decoration:none; min-width:0;">
         <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#2563EB; color:#fff; font-size:12px; font-weight:800; letter-spacing:.02em; flex-shrink:0;">IX</span>
         <span style="font-size:14px; font-weight:700; color:#111827; white-space:nowrap;">내부자거래 공통 UI</span>
         <span style="font-size:11px; color:#9AA3B2; font-weight:600; white-space:nowrap;">insider-ownership-common-v1</span>
       </a>
       <div style="display:inline-flex; background:#fff; border:1px solid #E0E5EC; border-radius:10px; padding:3px; flex-shrink:0;">
-        <a href="app.dc.html" style="display:inline-flex; align-items:center; gap:6px; padding:7px 15px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; white-space:nowrap; background:transparent; color:#6B7280;">공통 UI 화면</a>
-        <a href="handoff.dc.html" style="display:inline-flex; align-items:center; gap:6px; padding:7px 15px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; white-space:nowrap; background:#2563EB; color:#fff; box-shadow:0 1px 2px rgba(37,99,235,.25);">개발자 핸드오프</a>
+        <a href="내부자거래 공통 UI.dc.html" style="display:inline-flex; align-items:center; gap:6px; padding:7px 15px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; white-space:nowrap; background:transparent; color:#6B7280;">공통 UI 화면</a>
+        <a href="Handoff-필드매핑.dc.html" style="display:inline-flex; align-items:center; gap:6px; padding:7px 15px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; white-space:nowrap; background:#2563EB; color:#fff; box-shadow:0 1px 2px rgba(37,99,235,.25);">개발자 핸드오프</a>
       </div>
     </div>
   </div>
@@ -53,7 +53,7 @@
         <h1 style="margin:8px 0 6px; font-size:25px; font-weight:700; color:#111827; letter-spacing:-.01em;">내부자거래 공통 UI · 설계 핸드오프</h1>
         <div style="font-size:13.5px; color:#6B7280;">DART D002 · SEC Form 3·4·5 — 공통 스키마 · UI 규칙 · 정규화 프롬프트</div>
       </div>
-      <div style="text-align:right; font-size:12px; color:#9AA3B2; line-height:1.7;">v7.8 · 2026-06<br>schema: <b style="color:#2563EB;">insider-ownership-common-v1</b><br>관련 화면: <a href="app.dc.html" style="color:#2563EB; font-weight:600; text-decoration:none;">내부자거래 공통 UI →</a></div>
+      <div style="text-align:right; font-size:12px; color:#9AA3B2; line-height:1.7;">v10.10 · 2026-06<br>schema: <b style="color:#2563EB;">insider-ownership-common-v1</b><br>관련 화면: <a href="내부자거래 공통 UI.dc.html" style="color:#2563EB; font-weight:600; text-decoration:none;">내부자거래 공통 UI →</a></div>
     </div>
 
     <!-- 핵심 원칙 -->
@@ -307,15 +307,25 @@ Return the JSON now.</pre>
 
     <h3 style="margin:18px 0 8px; font-size:14px; font-weight:700; color:#374151;">List / Search</h3>
     <ul style="font-size:13px; color:#475467; line-height:1.8;">
+      <li><b>Multi-transaction filing(v8.9)</b>: 같은 filing 내 F/S/G transaction은 <b>개별 row로 분리</b>(단일 net 합산 금지). 메인 요약은 「거래 N건 · S 3건·G 1건」 형태. 예: Stevens Jun = S 200k/100k/400k + G 307.5k(모두 By Trust). Filing Detail·거래목록 상세는 개별 row 표시.</li>
+      <li><b>10b5-1은 transaction/footnote 단위</b>: filing 전체 일괄 적용 금지. 같은 filing 안에서도 F=비10b5 / S=10b5 가능(예: Puri·Robertson·Kress). row별 <code>is10b5</code>로 판단, footnote 연결. <b>Adoption date</b>: Shah 2024-11-25, Dabiri 2025-12-10, Kress 2025-03-04 등 footnote/remarks에 보존.</li>
+      <li><b>Trust / indirect ownership</b>: <code>directOrIndirectOwnership=I</code> + <code>natureOfOwnership</code>(By Trust / Envy Trust / Horne Teter Family Living Trust 등) + footnote 연결 필수. Filing Detail 보유 내역에 Trust 명의 노출.</li>
+      <li><b>Weighted average / price range</b>: 단일=price, 가중평균=Avg 표시, range는 footnote에 가격범위(예: Shah $175.82~$176.57, Kress $171.85~$177.92). 내부 <code>value_source: reported|calculated|unavailable</code> 구분 유지.</li>
+      <li><b>NVDA 배치 표기 정정(v8.8)</b>: US NVDA 12건 = <b>12 filing / 1 issuer group(cik 0001045810) / 12 reporting owner</b>(12 issuer/13 issuer group 아님). 벡트 D002 포함 시 13 filing / 2 issuer group / 13 reporting-owner filing.</li>
+      <li><b>Event cluster 규칙(v8.8)</b>: 동일 issuer + 동일 transaction_date + 동일 transactionCode + 유사 reason이 여러 reporting owner에서 동시 발생(예: NVDA 2026-03-18 F 6명) → issuer card 내부에서 cluster summary("F · 세금원천징수 · 6명 동시 보고") + 펼침 시 개별 owner row 노출, row별 「거래목록 보기」 유지.</li>
+      <li><b>10b5-1 vs KR 거래계획 분리</b>: KR 거래계획보고서·planned_transactions 등은 out-of-scope. <b>US Rule 10b5-1은 in-scope</b>(Form 4 footnote/status badge로 유지, Planned/Trading plan badge로 바꾸지 않음). adoption date는 footnote/remarks에 보존.</li>
+      <li><b>UI placeholder 금지</b>: 사용자-facing UI에 <code>(qty)</code>·<code>undefined</code>·<code>NaN</code>·raw <code>null</code> 노출 금지. 추출 실패 시 <b>「수량 미추출」/「단가 미추출」/「확인 필요」</b> 같은 사용자 문구로 표시, schema 값은 null 유지.</li>
+      <li><b>Parser Input Pipeline 유지</b>: PDF/HTML은 LLM에 직접 투입 금지. DART parser로 metadata/contents/tables/tables_mdkv 추출 후 prompt에 투입. KR D002는 파서 산출물 함께 업로드 권장.</li>
       <li>그룹형 단일 뷰(테이블·카드 뷰 제거, 보기 전환 UI 없음). 종목 기준 그룹 고정(<code>group_by=issuer/ticker</code>).</li>
-      <li>필터는 <b>국가(All/KR/US)</b>·<b>방향(전체/취득/처분/보유만)</b>만. <b>Form 필터 제거</b> — Form은 행 요약(<code>거래일 · Form 4 · N건</code>)으로만.</li>
+      <li>필터 toolbar(v8.7): 단일 행 compact toolbar — [국가 segmented] · [변동유형 segmented] · [공시유형 <b>select dropdown</b>]. 컨테이너 배경 매우 약하게, 비선택 투명, 선택만 강조. 공시유형은 길이 줄이려 dropdown으로 전환. <b>정렬</b>은 필터에서 제외하고 <b>결과 안내 줄 우측</b>에 배치(라벨 없음, 값만 노출). placeholder 「회사명, 티커, 내부자·보고자 검색」.</li>
       <li>회사명 primary, ticker/code secondary. 검색바 아래는 KPI 카드 대신 한 줄 메타.</li>
       <li>그룹 헤더 CTA(v7.3): <b>「최신 공시 보기 ›」</b> 1개만 — issuer group의 최신 filing 1건 상세로 이동. <b>「종목 거래 목록 보기」 제거</b>. <b>Form 4 고정 아님</b> — filing_date 최신 기준, 동일 날짜는 거래/변동 있음 &gt; Form4 &gt; Form5 &gt; Form3 &gt; 정정 &gt; holding-only/no-securities tie-break(Late·Amendment·No securities 비숨김). KR은 최신 D002 기준. 헤더 전체 클릭 없음.</li>
       <li>그룹 헤더 identity: <code>[국가] 회사명  ticker·market</code> 한 줄(국가 badge 좌, 회사명 primary, ticker·market secondary 우) + 아래 줄 공시·보고자 수·최신 공시일. 사용자-facing 문구에 7섹션·공통 스키마 등 내부 용어 미사용.</li>
       <li><b>그룹핑 키(v6.2): issuer.cik(US) / corp_code(KR) 우선</b>, ticker는 표시용 metadata. 동일 issuer의 ticker 변경(FB↔META, 동일 cik)이 있어도 한 그룹으로 묶고 분리하지 않는다. <b>former_symbols[]</b>=과거 변경 ticker(FB→META) / <b>alternate_symbols[]</b>=동시 복수 클래스(GOOG/GOOGL) — 둘을 섞지 않음. former_symbols/alternate_symbols는 historical 검색·중복 방지용 보조 필드(이전 ticker는 보조 텍스트로만 노출).</li>
-      <li>그룹 행은 <b>5컬럼 grid</b>(보고자·거래일 / 거래·공시 유형 / 수량·금액 / 공시일·상태 / 액션) + 미니 컬럼 헤더. 모두 좌측 정렬, 액션만 우측.</li>
+      <li>그룹 행은 <b>5컬럼 grid</b>(<b>내부자 · 보고자</b>·거래일 / 거래·공시 유형 / 수량·금액 / 공시일·상태 / 액션) + 미니 컬럼 헤더. 모두 좌측 정렬, 액션만 우측. List/Search 컬럼명은 v8.4부터 <b>「내부자 · 보고자」</b>(KR D002 보고자와 US Form 3·4·5 reporting owner/insider 동시 포괄). Filing Detail 1번 섹션명은 <b>「보고자 · 내부자 정보」</b> 유지. 거래목록 상세 표현은 <b>「내부자 거래목록」</b> 또는 「내부자 · 보고자 거래목록」.</li>
       <li><b>정렬(v7.7)</b>: issuer group은 <b>latest_filing_date DESC</b>(group 내 모든 filing/row 중 최신 — Form4 고정 아님, D002·3·4·5·정정·noSec·holding-only 전부 포함, cik/corp_code 그룹핑 후 계산). <b>카드 내부 row는 filing_date DESC 우선</b>(Form 종류는 정렬 우선순위 아님) → 동일 날짜에만 거래있음 → Late › Amendment › No securities › Holding-only › 원본순. 날짜는 <code>YYYY-MM-DD / YYYY.MM.DD / YYYY년MM월DD일</code> normalize 후 비교. <b>header 최신 공시일 = 첫 row filing_date 일치</b>. 기본 5개 row는 이 정렬 결과 상위 5개.</li>
       <li><b>행 action(v7.4): 「거래목록 보기」</b> — 해당 row의 보고자/거래·공시 묶음 기준 거래·변동 내역(Owner History)으로 이동. <b>「공시 상세 보기」로 쓰지 않음</b>. row 유형별 다른 액션명 금지. <b>그룹 내 아코디언</b>: 기본 5개 row, 6개 이상이면 <b>「+ N건 더 보기 / 접기」</b>로 같은 카드 안에서 확장(페이지 이동 없음). 노출 5개는 <b>상태 우선 정렬</b>(Late › Amendment › No securities › Holding-only, 그다음 최신일) — 중요 상태 row가 +N에 숨겨지지 않음. 버튼에 <code>aria-expanded·aria-label</code>, focus-visible ring.</li>
+      <li><b>수량/금액 컬럼(v8.0): 집계 타입별 평균가</b> — <b>같은 방향·같은 증권</b>(single/multi_same_direction)일 때만 「평균가 · 금액」 표시. <b>혼재(취득+처분)·derivative-linked(M/S)·D002 이중기준·Form5 gift A/D pair는 대표 평균가 금지</b> → 「거래금액 합계」 또는 「거래 N건」. 단가 없음=「단가 미기재」, 금액 없음=「거래금액 없음」.</li>단가 없으면 「단가 미기재 · 거래금액 없음」). 컬럼 추가 없이 기존 칸 압축. 보고자별 상세(거래목록 보기→Owner History)는 수량·단가·금액·공시일·상태·footnote 컬럼 분리.</li>
       <li>badge 우선순위(v6.0): 최대 2개 + <code>+N</code> 축약하되 <b>Late › Amendment › No securities › Holding-only › 10b5-1 › Trading plan/Planned › Derivative/Stock Units › Footnote</b> 순. <b>Late는 +N 안에 숨기지 않는다</b>(Amendment도 가능한 한 노출). 빈값은 dash + 보조문구.</li>
     </ul>
 
@@ -335,6 +345,7 @@ Return the JSON now.</pre>
     <ul style="font-size:13px; color:#475467; line-height:1.8;">
       <li>우측 「공시 선택」 dropdown 제거. breadcrumb 대신 좌측 <b>「← 돌아가기」</b>(<code>prev_view</code> 기억). 타이틀 아래 시스템 설명문구 없음.</li>
       <li>「공시 요약」 본문 섹션 → <b>상단 Page Meta Card로 이동</b>(삭제 아님). 본문은 <b>「보고자 · 내부자 정보」부터</b> 시작.</li>
+      <li><b>Form family 탭바(v8.3 · US only)</b>: <b>상단 메타 카드 위</b>(타이틀 아래)에 배치 — 페이지 전체 기준 Form을 전환하는 최상위 전환 장치. <b>Form 3/3A · Form 4/4A · Form 5/5A</b> 3개 family — 각 탭은 해당 issuer(cik)의 family 최신 filing 1건(filing_date DESC, Amendment 포함) 대표. 탭 클릭 시 <code>selectedId</code> 교체 → <b>메타 카드 + 1~6섹션 전체</b>가 해당 filing으로 갈아끼움. 메타 카드 badge는 실제 filing 타입(Form 3/A 등). 존재하지 않는 family는 탭 비노출. 기본 선택은 진입 filing. <b>KR D002에는 탭바 미적용</b>. role=tablist/tab + aria-selected. 모바일에서는 wrap 허용.</li>
       <li>Page Meta Card 2열: 좌 identity([국가][문서유형] badge + 회사명 + 코드·시장), 우 핵심 메타 2×2(공시일·보고기준일·보고의무발생일·접수번호). <b>국가·문서유형은 badge에서만</b>(grid 제외). <b>(v5.8) Page Meta Card는 issuer/document meta 전용 — reporting_owner(보고자명·직위·owner_type·관계) 표시 금지</b>. 보고자 정보는 본문 「보고자·내부자 정보」 섹션에서만 렌더링. KR/US 모든 공시 유형 공통, 특정 샘플에 종속되지 않음.</li> <b>하단 보조 메타 줄(v5.6)</b>: 보고구분·원 제출일·보고서작성기준일 등 상단/배너 중복 항목은 노출 금지 — KR은 하단 줄 자체를 숨김, US만 10b5-1·Form5 flags 노출. 중복 정보 반복 금지.</li>
       <li>거래계획 문서는 alert banner(해석 안내) + plan summary card(핵심 수치) 유지.</li>
       <li><b>레이아웃·시각화(v5.1)</b>: 카드 사용은 <b>Page Meta Card · 거래계획 요약 · 보고자+stat 통합 panel</b>에만. 그 외는 section block / table / divider list / compact empty row.</li>
@@ -666,9 +677,11 @@ Return the JSON now.</pre>
     <p style="margin:0 0 8px; font-size:12px; color:#9AA3B2;">● 필수 · △ 케이스에 따라 · ○ 최초보유 · — 해당 없음</p>
     <div style="border:1px solid #CDEBD9; background:#F3FBF6; border-radius:12px; padding:14px 16px; margin-bottom:14px;">
       <div style="font-size:13px; font-weight:700; color:#1B7A45; margin-bottom:6px;">D002 Real Filing Validation (2026-06-16 소유상황보고서)</div>
-      <div style="font-size:12.5px; color:#3F7A57; line-height:1.75;">실공시 <b>15 filing / 12 issuer group / 15 reporting owner</b> 추출·UI 반영 완료(원익피앤이·케이비지·아즈텍WB 각 2 owner). 모두 <code>sample</code> 필드 없음(실데이터). 구조 검증용 representative 3건은 제거. <b>Sample vs Real</b>: 실공시=<code>sample:false</code>/없음, 대표 예시=<code>sample:true</code> — 혼용 금지.<br>
-      검증된 핵심 케이스: <b>랩지노믹스</b>(특정증권등 29.99→26.02% ↔ 주권 16.16→18.71%, 전환사채권 7,328,691 — 이중기준 분리) · <b>케이비지 부삼열</b>(수량 +3,849, 비율 −0.18%p — CB 전환으로 발행총수↑) · <b>영흥</b>(수량 −4,000,000, 비율 +1.43%p — 자기주식 소각). KOSPI(국도화학·영흥·한화손해보험)/KOSDAQ, 개인/국내법인, 10%주주/사실상지배주주 정규화.<br>
-      <b>단가 backfill(완료)</b>: 세부변동내역 4p 표에서 단가 추출 — 다행 매수는 기간 평균단가(priceNote 표기), 단가 <code>-</code>/없음/(해당없음)은 <code>price=null</code> 유지. 수량·비율·변동전/증감/변동후·보고사유·변동일 등 정상값은 미변경. <b>영흥</b>은 원문 "주식병합 액면병합(5:1)" → 거래코드 주식병합으로 정정(price null). <b>이중기준 UI</b>: 보유 변화 요약에 "특정증권등 기준 / 주권 기준" 2단 라벨 + 증감 방향 상충 시 경고 노트(랩지노믹스). <b>거래계획 컬럼</b>은 source note 수준만 보존, planned transaction 의미로 active UI 노출 금지(out-of-scope 유지).</div>
+      <div style="font-size:13px; font-weight:700; color:#1B7A45; margin-bottom:6px;">D002 Real Filing Validation (v10.3 · parser-output 12건 + 벡트)</div>
+      <div style="font-size:12.5px; color:#3F7A57; line-height:1.75;"><b>parser-output 검증: d00220~d00231 = 12/12 PASS</b>. 입력=DART parser <code>common_schema_preview.json</code>, <code>insider-ownership-common-v1</code>로 전건 정상 정규화·UI 대체. 벡트 포함 <b>13 real D002 filings</b>(벡트+12)만 노출, representative sample 전부 keep set 제외.<br>
+      <b>source 계층</b>: <code>source_original</code>="DART PDF"(official, 대체 아님) · <code>source_parsed</code>={metadata.json, contents.json, tables.json, tables_mdkv.md, common_schema_preview.json}(machine-readable extraction layer). PDF 직접 추출이 CMap/custom subset font로 실패하면 <code>source_status:"needs_parser_output"</code> — <b>KR D002는 out-of-scope 처리 금지</b>(in-scope 유지).<br>
+      커버 케이스: 신규/변동/정정 · 직전보고서 없음(신규 3건) · 다건 거래(일진파워 5·엔젯 2·HLB 2) · 개인/국내법인 보고자(엔케이·대림통상) · 장내매수/증여 처분(에스피소프트, 단가 미기재+사유 footnote) · 신규상장 무단가(세미티에스) · 10%주주/사실상지배주주 · KOSPI/KOSDAQ 혼재.<br>
+      <b>parser QA 보완점</b>: ① d00220 정정인데 <code>date_of_original_submission</code> 누락 → UI 「—」, raw null 금지(parser에 원제출일 필드 추가 권장) · ② 일부 preview <code>report_date</code>에 확인문구 노이즈(UI는 <code>reportBaseDate</code> 사용해 영향 없음, parser 정정 권장) · ③ d00229 거래일(06-18)>공시일(06-17) → <code>parser_qa.warning: transaction_date_after_filing_date</code> 기록(렌더는 정상) · ④ <b>corp_code(8자리 고유번호) ≠ stock_code(6자리 종목코드)</b> 분리 — UI 표시는 stock_code, grouping key는 corp_code 우선, 누락 시 stock_code→회사명 fallback. <b>거래계획 컬럼</b>은 source note만 보존, planned transaction 의미로 active UI 노출 금지.</div>
     </div>
     <div style="border:1px solid #E6EAF0; border-radius:12px; padding:14px 16px; margin-bottom:14px;">
       <div style="font-size:13px; font-weight:700; color:#111827; margin-bottom:6px;">D002 전용 QA 체크리스트</div>
@@ -800,7 +813,7 @@ Return the JSON now.</pre>
     <!-- footer -->
     <div style="margin-top:40px; padding-top:18px; border-top:1px solid #E6EAF0; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
       <div style="font-size:12px; color:#9AA3B2;">insider-ownership-common-v1 · 화면 변경 시 ①스키마 ②매핑 ③Empty ④프롬프트 동기화 필수</div>
-      <a href="app.dc.html" style="font-size:13px; font-weight:600; color:#2563EB; text-decoration:none;">← 공통 UI 화면으로</a>
+      <a href="내부자거래 공통 UI.dc.html" style="font-size:13px; font-weight:600; color:#2563EB; text-decoration:none;">← 공통 UI 화면으로</a>
     </div>
 
   </div>
